@@ -2,6 +2,7 @@ import Request from './sessionSuperagent.js';
 import Q from 'q';
 import Markdown from 'markdown';
 import ent from 'ent';
+import Papa from 'papaparse';
 
 const unescapeInlineHtml = (html) => {
 	// find any inline HTML (as denoted by ```!inline-html [CODE] !inline-html```)
@@ -179,4 +180,23 @@ export const loadResources = () => {
 
 	return deferred.promise;
 
+}
+
+export const loadValidationTable = () => {
+
+	const deferred = Q.defer();
+
+	Papa.parse('./help/validations.csv', {
+            download: true,
+            header: true,
+			encoding: "UTF-8",
+            complete: (results) => {
+                deferred.resolve(results);
+            },
+            error: (err) => {
+            	deferred.reject(err);
+            }
+        });
+
+	return deferred.promise;
 }
