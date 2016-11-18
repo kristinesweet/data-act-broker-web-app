@@ -6,6 +6,7 @@
 import React from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
+import Q from 'q';
 
 import * as ReviewHelper from '../../helpers/reviewHelper.js';
 import * as AgencyHelper from '../../helpers/agencyHelper.js';
@@ -43,25 +44,35 @@ class ReviewDataContainer extends React.Component {
     	}
     }
 
-    loadData() {
-
-        let submission = {};
-
-    	ReviewHelper.fetchStatus(this.props.params.submissionID)
+    loadStatusData(toUpdate) {
+        return ReviewHelper.fetchStatus(this.props.params.submissionID)
             .then((data) => {
                 data.ready = true;
-                submission = data;
+                Object.assign(toUpdate, data);
 
                 return AgencyHelper.fetchAgencyName(data.cgac_code);
             })
             .then((name) => {
-                submission.agency_name = name;
-                return ReviewHelper.fetchObligations(this.props.params.submissionID);
-            })
+                toUpdate.agency_name = name;
+            });
+    }
+
+    loadObligationData(toUpdate) {
+        return ReviewHelper.fetchObligations(this.props.params.submissionID)
             .then((data) => {
-                submission.total_obligations = data.total_obligations;
-                submission.total_assistance_obligations = data.total_assistance_obligations;
-                submission.total_procurement_obligations = data.total_procurement_obligations;
+                toUpdate.total_obligations = data.total_obligations;
+                toUpdate.total_assistance_obligations = data.total_assistance_obligations;
+                toUpdate.total_procurement_obligations = data.total_procurement_obligations;
+            });
+    }
+
+    loadData() {
+
+        let submission = {};
+
+        Q.all([this.loadStatusData(submission),
+               this.loadObligationData(submission)])
+            .then((ignored) => {
                 this.setState(submission);
             })
             .catch((error) => {
