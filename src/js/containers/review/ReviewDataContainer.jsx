@@ -29,7 +29,8 @@ class ReviewDataContainer extends React.Component {
             ready: false,
             total_obligations: null,
             total_assistance_obligations: null,
-            total_procurement_obligations: null
+            total_procurement_obligations: null,
+            narratives: {}
         }
     }
 
@@ -66,12 +67,20 @@ class ReviewDataContainer extends React.Component {
             });
     }
 
+    loadNarrativeData(toUpdate) {
+        return ReviewHelper.fetchNarratives(this.props.params.submissionID)
+            .then((data) => {
+                toUpdate.narratives = data;
+            });
+    }
+
     loadData() {
 
         let submission = {};
 
         Q.all([this.loadStatusData(submission),
-               this.loadObligationData(submission)])
+               this.loadObligationData(submission),
+               this.loadNarrativeData(submission)])
             .then((ignored) => {
                 this.setState(submission);
             })

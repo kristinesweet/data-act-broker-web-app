@@ -416,3 +416,19 @@ export const fetchObligations = (submissionId) => {
 
 	return deferred.promise;
 }
+
+
+export const fetchNarratives = (submissionId) => {
+    const deferred = Q.defer();
+
+    Request.get(kGlobalConstants.API + 'submission/' + submissionId + '/narrative')
+        .end((errFile, res) => {
+            if (errFile || !res.ok) {
+                deferred.reject(errFile);
+            }
+            else {
+                deferred.resolve(res.body);
+            }
+        });
+    return deferred.promise;
+}

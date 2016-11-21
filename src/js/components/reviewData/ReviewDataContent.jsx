@@ -11,6 +11,7 @@ import ReviewDataContentRow from './ReviewDataContentRow.jsx';
 import ReviewDataButton from './ReviewDataButton.jsx';
 import ReviewDataNotifyModal from './ReviewDataNotifyModal.jsx';
 import ReviewDataCertifyModal from './CertificationModal/ReviewDataCertifyModal.jsx';
+import ReviewDataNarratives from './ReviewDataNarratives.jsx';
 import moment from 'moment';
 
 import * as ReviewHelper from '../../helpers/reviewHelper.js';
@@ -184,6 +185,9 @@ export default class ReviewDataContent extends React.Component {
                         <div className="col-md-8 usa-da-review-data-alternating-rows">
                             {reportRows}
                         </div>
+                    </div>
+                    <div className="mt-20">
+                        <ReviewDataNarratives {narratives: this.props.data.narratives} />
                     </div>
                     <div className="mt-20">
                         <div className="submission-wrapper">
