@@ -7,8 +7,9 @@ import React from 'react';
 import Modal from 'react-aria-modal';
 import _ from 'lodash';
 
+import * as Icons from '../../SharedComponents/icons/Icons.jsx';
+
 import ModalStatus from './ModalStatus.jsx';
-import ModalPermissions from './ModalPermissions.jsx';
 
 export default class UserModal extends React.Component {
 
@@ -21,17 +22,7 @@ export default class UserModal extends React.Component {
 			title: "",
 			agency: "",
 			status: "",
-			is_active: true,
-			permissions: {
-				agency_user: false,
-				website_admin: false,
-				agency_admin: false
-			},
-			originalPermissions: {
-				agency_user: false,
-				website_admin: false,
-				agency_admin: false
-			}
+			is_active: true
 		};
 	}
 
@@ -42,40 +33,14 @@ export default class UserModal extends React.Component {
 	}
 
 	setUserState() {
-		const permissionValues = ['agency_user', 'website_admin', 'agency_admin'];
-		const permissions = {};
-
-		permissionValues.forEach((permission) => {
-			if (_.indexOf(this.props.user.permissions, permission) > -1) {
-				permissions[permission] = true;
-			}
-			else {
-				permissions[permission] = false;
-			}
-		});
-
 		this.setState({
 			name: this.props.user.name,
 			email: this.props.user.email,
 			title: this.props.user.title,
 			agency: this.props.user.agency_name,
 			status: this.props.user.status,
-			is_active: this.props.user.is_active,
-			permissions: permissions,
-			originalPermissions: permissions
+			is_active: this.props.user.is_active
 		});
-	}
-
-	changePermission(e) {
-		const permissions = Object.assign({}, this.state.permissions);
-		const oldValue = this.state.originalPermissions[e.target.value];
-
-		permissions[e.target.value] = !oldValue;
-
-		this.setState({
-			permissions: permissions
-		});
-
 	}
 
 	changeStatus(e) {
@@ -94,29 +59,6 @@ export default class UserModal extends React.Component {
 			changes.status = this.state.status;
 		}
 
-		// determine if permissions have changed
-		let permString = "";
-		let permissionChanged = false;
-		Object.keys(this.state.permissions).forEach((permission) => {
-			if (this.state.permissions[permission] != this.state.originalPermissions[permission]) {
-				permissionChanged = true;
-			}
-
-			if (this.state.permissions[permission] == true) {
-				if (permString != "") {
-					permString += "," + permission;
-				}
-				else {
-					permString = permission;
-				}
-			}
-
-		});
-
-		if (permissionChanged) {
-			changes.permissions = permString;
-		}
-
 		this.props.onChange(this.props.user, changes);
 
 		this.props.closeModal();
@@ -128,6 +70,17 @@ export default class UserModal extends React.Component {
 		});
 
 		this.props.closeModal();
+	}
+
+	deleteUser(e) {
+		e.preventDefault();
+
+		const confirm = window.confirm('Are you sure you want to delete ' + this.props.user.name + ' (' + this.props.user.email + ') from the DATA Act Broker?');
+
+		if (confirm) {
+			this.props.deleteUser(this.props.user);
+			this.props.closeModal();
+		}
 	}
 
 	render() {
@@ -171,11 +124,6 @@ export default class UserModal extends React.Component {
 									<ModalStatus value={this.state.status} onChange={this.changeStatus.bind(this)} />
 								</div>
 
-								<div className="form-group">
-									<label>Permissions</label>
-									<ModalPermissions value={this.state.permissions} onChange={this.changePermission.bind(this)} />
-								</div>
-
 								<div className="form-group text-center">
 									<button className="usa-da-button btn-danger" onClick={this.disableUser.bind(this)}>Disable User</button>
 								</div>
@@ -183,13 +131,27 @@ export default class UserModal extends React.Component {
 
 							<hr />
 
-							<div className="modal-buttons text-right">
-								<button className="usa-da-button btn-gray" onClick={this.props.closeModal}>
-									Cancel
-								</button>
-								<button className="usa-da-button btn-primary" onClick={this.saveChanges.bind(this)}>
-									Save
-								</button>
+							<div className="modal-buttons row">
+								<div className="col-md-6 text-left">
+									<div className="delete-wrap">
+										<div className="usa-da-icon">
+											<Icons.ExclamationTriangle alt="Danger icon" />
+										</div>
+										<div className="delete-link">
+											<a href="#" className="danger-delete" onClick={this.deleteUser.bind(this)}>
+												Delete User
+											</a>
+										</div>
+									</div>
+								</div>
+								<div className="col-md-6 text-right">
+									<button className="usa-da-button btn-gray" onClick={this.props.closeModal}>
+										Cancel
+									</button>
+									<button className="usa-da-button btn-primary" onClick={this.saveChanges.bind(this)}>
+										Save
+									</button>
+								</div>
 							</div>
 
 						</div>
