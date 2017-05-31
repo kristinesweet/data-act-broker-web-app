@@ -47,6 +47,7 @@ export default class GenerateFilesOverlay extends React.Component {
 	}
 
 	render() {
+		console.log(this.props)
 		let buttonClass = '-disabled';
 		let buttonDisabled = true;
 		let nextClass = '-disabled';
@@ -65,6 +66,7 @@ export default class GenerateFilesOverlay extends React.Component {
 		else if (this.props.state == "failed") {
 			buttonClass = ' btn-primary';
 			buttonDisabled = false;
+			nextDisabled = false;
 
 			header = "An error occurred while generating your files.";
 			detail = this.props.errorDetails;
